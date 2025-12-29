@@ -1,0 +1,39 @@
+[project]
+name = "py-terratest"
+version = "0.1.0"
+description = "A Terratest-like test library for Python"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "boto3>=1.42.17",
+]
+authors = [
+    {name = "Jonathan Ballet", email = "jon@multani.info" },
+]
+
+[dependency-groups]
+aws = []
+dev = [
+    "mypy>=1.19.1",
+    "ruff>=0.14.10",
+    "types-boto3[autoscaling,ec2]>=1.42.17",
+]
+
+[tool.mypy]
+packages = [
+    "terratest",
+]
+strict = true
+
+[tool.ruff.lint]
+ignore = [
+    # It's OK to have long line
+    "E501",
+]
+extend-select = [
+    # Sort imports
+    "I",
+]
+
+[tool.ruff.lint.isort]
+force-single-line = true
