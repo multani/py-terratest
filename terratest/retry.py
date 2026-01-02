@@ -1,5 +1,6 @@
-import contextlib
 import time
+from contextlib import AbstractContextManager
+from contextlib import contextmanager
 from typing import Any
 from typing import Callable
 from typing import Iterator
@@ -19,25 +20,34 @@ class retry:
             with catcher:
                 callback(*args, **kwargs)
 
-    def __iter__(self) -> Iterator[contextlib.AbstractContextManager[None]]:
-        print(f"{self.message}: starting")
+    def __iter__(self) -> Iterator[AbstractContextManager[None]]:
+        prefix = f"{self.message}: "
+        print(
+            f"{prefix}starting, will try with attemps={self.attempts}, interval={self.interval}s"
+        )
+        start_time = time.time()
 
         nb_attempts = 0
         while not self.ok:
             nb_attempts += 1
+            prefix = f"{self.message} [{nb_attempts}/{self.attempts}]: "
 
             yield self.catcher()
 
             if not self.ok:
                 if nb_attempts > self.attempts:
-                    msg = f"{self.message}: failed after {self.attempts} attempts, giving up"
+                    msg = f"{prefix}failed after {self.attempts} attempts, giving up"
                     assert False, msg
 
-                msg = f"{self.message}: try {nb_attempts}/{self.attempts} failed, will retry in {self.interval} seconds"
+                msg = f"{prefix}failed, will retry in {self.interval} seconds"
                 print(msg)
                 time.sleep(self.interval)
 
-    @contextlib.contextmanager
+        stop_time = time.time()
+        elapsed_time = int(stop_time - start_time)
+        print(f"{prefix}success! (after {elapsed_time} seconds)")
+
+    @contextmanager
     def catcher(self) -> Iterator[None]:
         try:
             yield
