@@ -12,7 +12,9 @@ class retry:
         self.interval = interval
         self.ok = False
 
-    def __call__(self, callback: Callable[[Any], Any], *args: Any, **kwargs: Any) -> None:
+    def __call__(
+        self, callback: Callable[[Any], Any], *args: Any, **kwargs: Any
+    ) -> None:
         for catcher in self:
             with catcher:
                 callback(*args, **kwargs)

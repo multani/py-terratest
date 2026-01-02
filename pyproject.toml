@@ -1,22 +1,46 @@
 [project]
-name = "py-terratest"
+name = "terratest"
 version = "0.1.0"
 description = "A Terratest-like test library for Python"
+authors = [
+    {name = "Jonathan Ballet", email = "jon@multani.info" },
+]
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "boto3>=1.42.17",
-]
-authors = [
-    {name = "Jonathan Ballet", email = "jon@multani.info" },
+    "aiobotocore>=3.0.0",
+    "boto3>=1.42.5",
+    "pytest>=9.0.2",
 ]
 
 [dependency-groups]
 aws = []
 dev = [
     "mypy>=1.19.1",
+    "pytest-cov>=7.0.0",
     "ruff>=0.14.10",
+    "types-boto3-secretsmanager>=1.42.8",
     "types-boto3[autoscaling,ec2]>=1.42.17",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest]
+addopts = [
+"--cov=terratest",
+"--cov-branch",
+"--cov-report=html",
+"--cov-report=term",
+"--doctest-modules",
+"--tb=short",
+"--verbose",
+"--verbose",
+]
+testpaths = [
+    "terratest",
+    "tests",
 ]
 
 [tool.mypy]

@@ -1,9 +1,23 @@
+from typing import TYPE_CHECKING
+
 import boto3
-from types_boto3_autoscaling import AutoScalingClient
-from types_boto3_ec2 import EC2Client
+
+if TYPE_CHECKING:
+    from types_boto3_autoscaling import AutoScalingClient
+    from types_boto3_ec2 import EC2Client
+    from types_boto3_secretsmanager import SecretsManagerClient
+else:
+    AutoScalingClient = object
+    EC2Client = object
+    SecretsManagerClient = object
 
 
-def get_instance_ids_for_asg(asg_name: str, region: str, client: AutoScalingClient | None=None) -> list[str]:
+def get_instance_ids_for_asg(
+    asg_name: str,
+    region: str,
+    *,
+    client: AutoScalingClient | None = None,
+) -> list[str]:
     if client is None:
         client = boto3.client("autoscaling")
 
@@ -16,7 +30,12 @@ def get_instance_ids_for_asg(asg_name: str, region: str, client: AutoScalingClie
     return sorted([i["InstanceId"] for i in group["Instances"]])
 
 
-def get_public_ip_of_ec2_instance(instance_id: str, region: str, client: EC2Client|None=None) -> str:
+def get_public_ip_of_ec2_instance(
+    instance_id: str,
+    region: str,
+    *,
+    client: EC2Client | None = None,
+) -> str:
     if client is None:
         client = boto3.client("ec2")
 
@@ -26,3 +45,16 @@ def get_public_ip_of_ec2_instance(instance_id: str, region: str, client: EC2Clie
     assert 1 == len(response["Reservations"][0]["Instances"])
 
     return response["Reservations"][0]["Instances"][0]["PublicIpAddress"]
+
+
+def get_secret_value(
+    secret_name: str,
+    region: str,
+    *,
+    client: SecretsManagerClient | None = None,
+) -> str:
+    if client is None:
+        client = boto3.client("secretsmanager", region_name=region)
+
+    response = client.get_secret_value(SecretId=secret_name)
+    return response["SecretString"]

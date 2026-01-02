@@ -8,3 +8,7 @@ fmt:
 .PHONY: check
 check:
 	uv run mypy
+
+.PHONY: test
+test:
+	uv run pytest -s
